@@ -1,0 +1,118 @@
+<script type="text/javascript" src="https://pubnub.github.io/eon/v/eon/1.0.0/eon.js"></script>
+<link type="text/css" rel="stylesheet" href="https://pubnub.github.io/eon/v/eon/1.0.0/eon.css" />
+<div id="cpuchart"></div>
+<div id="ramchart"></div>
+<script type="text/javascript">
+var __eon_pubnub = new PubNub({
+  subscribeKey: "sub-c-c2edf284-d235-11e7-aee1-6e8e9d2d00b1"
+});
+var __eon_cols = ["cpu_usage"]; 
+var __eon_labels = {"cpu_usage":"Využití CPU [%]"}; 
+cpuchart = eon.chart({
+  pubnub: __eon_pubnub,
+  channels: ["CPU-usage"],
+  history: false,
+  flow: true,
+  rate: 1000,
+  limit: 10,
+  generate: {
+    bindto: "#cpuchart",
+    data: {
+      colors: {"Využití CPU [%]":"#66a616",},
+      type: "area-spline"
+    },
+    transition: {
+      duration: 250
+    },
+    axis: {
+      x: {
+        label: ""
+      },
+      y: {
+        label: ""
+      }
+    },
+    grid: {
+      x: {
+        show: true 
+      },
+      y: {
+        show: true 
+      }
+    },
+    tooltip: {
+     show: true
+    },
+    point: {
+      show: true
+    }
+  },
+  transform: function(message) {
+    var message = eon.c.flatten(message.eon);
+    var o = {};
+    for(index in message) {
+      if(__eon_cols.indexOf(index) > -1){
+        o[__eon_labels[index] || index] = message[index];
+      }
+    }
+    return {
+      eon: o
+    };
+  }
+});
+
+var __eon2_cols = ["ram_usage"]; 
+var __eon2_labels = {"ram_usage":"Využití RAM [%]"};
+ramchart = eon.chart({
+  pubnub: __eon_pubnub,
+  channels: ["RAM-usage"],
+  history: false,
+  flow: true,
+  rate: 1000,
+  limit: 10,
+  generate: {
+    bindto: "#ramchart",
+    data: {
+      colors: {"Využití RAM [%]":"#1f77b4",},
+      type: "area-spline"
+    },
+    transition: {
+      duration: 250
+    },
+    axis: {
+      x: {
+        label: ""
+      },
+      y: {
+        label: ""
+      }
+    },
+    grid: {
+      x: {
+        show: true 
+      },
+      y: {
+        show: true 
+      }
+    },
+    tooltip: {
+     show: true
+    },
+    point: {
+      show: true
+    }
+  },
+  transform: function(message) {
+    var message = eon.c.flatten(message.eon);
+    var o = {};
+    for(index in message) {
+      if(__eon2_cols.indexOf(index) > -1){
+        o[__eon2_labels[index] || index] = message[index];
+      }
+    }
+    return {
+      eon: o
+    };
+  }
+});
+</script>
