@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # (c) 2017 pd-tech
 
@@ -20,21 +20,21 @@ async def measurement_delayer(period):
     await asyncio.sleep(period)
 
 def monitor_cpu(cpumon_interval, pubnub, publish_at_sleep):
+    asyncio.set_event_loop(publish_at_sleep)
     while True:
         cpu_usg = psutil.cpu_percent()
         values = {'eon': {'x': time.time(), 'cpu_usage': cpu_usg}}  # format gathered data for the PubNub service
 
-        asyncio.set_event_loop(publish_at_sleep)
         tasks = [asyncio.ensure_future(pn_streamer(pubnub, 'CPU-usage', values)),
                  asyncio.ensure_future(measurement_delayer(cpumon_interval))]   # publish when sleeping to ensure static (1 second) delay because of various network response time
         publish_at_sleep.run_until_complete(asyncio.gather(*tasks))
 
 def monitor_ram(rammon_interval, pubnub, publish_at_sleep):
+    asyncio.set_event_loop(publish_at_sleep)
     while True:
         ram_usg = psutil.virtual_memory()[2]    # we need just the third element of the tuple (=percentage)
         values = {'eon': {'x': time.time(), 'ram_usage': ram_usg}}  # format gathered data for the PubNub service
 
-        asyncio.set_event_loop(publish_at_sleep)
         tasks = [asyncio.ensure_future(pn_streamer(pubnub, 'RAM-usage', values)), 
                          asyncio.ensure_future(measurement_delayer(rammon_interval))]   # publish when sleeping to ensure static (1 second) delay because of various network response time
         publish_at_sleep.run_until_complete(asyncio.gather(*tasks))
